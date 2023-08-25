@@ -6,8 +6,8 @@ locals {
 terraform {
   required_version = ">= 1.0"
   backend "s3" {
-    region = "us-east-1"        
-    bucket = "miles-tfaction-backend" 
+    region = "us-east-1"
+    bucket = "miles-tfaction-backend"
     key    = "github/foo/v1/terraform.tfstate"
   }
 }
