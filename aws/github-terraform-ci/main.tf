@@ -1,6 +1,6 @@
 locals {
   repo_name      = "mileslee-nsuslab/tfaction-example"
-  s3_bucket_name = "miles-terraform-backend"
+  s3_bucket_name = "miles-tfaction-backend"
   region         = "us-east-1"
 }
 
