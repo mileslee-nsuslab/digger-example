@@ -1,7 +1,7 @@
 locals {
   # CHANGE
   repo_name      = "suzuki-shunsuke/tfaction-getting-started"
-  s3_bucket_name = "<S3 Bucket Name for tfaction>"
+  s3_bucket_name = "miles-terraform-backend"
   region         = "us-east-1"
 }
 

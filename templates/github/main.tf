@@ -6,8 +6,8 @@ locals {
 terraform {
   required_version = ">= 1.0"
   backend "s3" {
-    region = "us-east-1"        # CHANGE
-    bucket = "<S3 Bucket Name>" # CHANGE
+    region = "us-east-1"        
+    bucket = "miles-terraform-backend" 
     key    = "%%TARGET%%/v1/terraform.tfstate"
   }
 }
