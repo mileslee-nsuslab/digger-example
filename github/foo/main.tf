@@ -25,6 +25,7 @@ terraform {
 # Resource
 ################################################################################
 
+
 // S3 bucket resource
 resource "aws_s3_bucket" "s3_bucket" {
   bucket = "test-bucket-393828"
@@ -32,7 +33,7 @@ resource "aws_s3_bucket" "s3_bucket" {
 
   tags = {
     env = "tfaction"
-    
+
   }
 }
 
