@@ -1,6 +1,5 @@
 locals {
-  # CHANGE
-  github_owner = "suzuki-shunsuke"
+  github_owner = "mileslee-nsuslab"
 }
 
 terraform {

@@ -3,15 +3,15 @@ target_groups:
 - working_directory: github/
   target: github/
   aws_region: us-east-1
-  s3_bucket_name_plan_file: 'miles-terraform-backend' # CHANGE
-  s3_bucket_name_tfmigrate_history: 'miles-terraform-backend' # CHANGE
+  s3_bucket_name_plan_file: 'miles-terraform-backend' 
+  s3_bucket_name_tfmigrate_history: 'miles-terraform-backend' 
   template_dir: templates/github
 
   terraform_plan_config:
-    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_terraform_plan # CHANGE
+    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_terraform_plan 
   tfmigrate_plan_config:
-    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_tfmigrate_plan # CHANGE
+    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_tfmigrate_plan 
   terraform_apply_config:
-    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_terraform_apply # CHANGE
+    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_terraform_apply 
   tfmigrate_apply_config:
-    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_tfmigrate_apply # CHANGE
+    aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_tfmigrate_apply 

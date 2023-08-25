@@ -97,7 +97,7 @@ label.tf
 
 ```tf
 resource "github_issue_label" "bar" {
-  repository  = "tfaction-getting-started" # CHANGE
+  repository  = "tfaction-example" 
   name        = "bar"
   color       = "FF0000"
   description = "bar"
