@@ -15,4 +15,4 @@ jobs:
           aqua_version: v2.3.6
       - run: tfaction create-drift-issues
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{github.token}}
