@@ -23,3 +23,10 @@ terraform {
 provider "github" {
   owner = local.github_owner
 }
+
+
+resource "aws_default_vpc" "default" {
+  tags = {
+    Name = "Default VPC created by Terraform"
+  }
+}

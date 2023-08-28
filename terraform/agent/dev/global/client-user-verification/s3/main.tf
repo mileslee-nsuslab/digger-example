@@ -23,3 +23,12 @@ terraform {
 provider "github" {
   owner = local.github_owner
 }
+
+resource "aws_s3_bucket" "example" {
+  bucket = "tfaction-bucket-3423"
+
+  tags = {
+    Name        = "My bucket"
+    Environment = "Dev"
+  }
+}
