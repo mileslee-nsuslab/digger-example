@@ -16,7 +16,7 @@ jobs:
       - uses: aquaproj/aqua-installer@294926f94b4233f202a2f03875c604f840cfed70 # v2.1.1
         with:
           aqua_version: v2.3.6
-      - run: tfaction pick-out-drift-issues
+      - run: tfaction --log-level=debug pick-out-drift-issues
         id: pick-out-drift-issues
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
@@ -79,3 +79,4 @@ jobs:
         with:
           status: ${{job.status}}
           github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          
