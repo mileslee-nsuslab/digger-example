@@ -27,6 +27,6 @@ provider "github" {
 
 resource "aws_default_vpc" "default" {
   tags = {
-    Name = "Default VPC created by Terraform"
+    Name = "Default VPC created by Terraform edited"
   }
 }
