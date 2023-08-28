@@ -28,8 +28,8 @@ target_groups:
 #   s3_bucket_name_tfmigrate_history: 'miles-tfaction-backend' 
 #   template_dir: templates/example
 
-- working_directory: .
-  target: .
+- working_directory: terraform/
+  target: terraform/
   aws_region: us-east-1
   s3_bucket_name_plan_file: 'miles-tfaction-backend' 
   s3_bucket_name_tfmigrate_history: 'miles-tfaction-backend' 
