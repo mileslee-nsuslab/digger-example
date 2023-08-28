@@ -24,9 +24,19 @@ provider "github" {
   owner = local.github_owner
 }
 
+provider "aws" {
+  region = "us-east-1"
+}
+
 
 resource "aws_default_vpc" "default" {
   tags = {
     Name = "Default VPC created by Terraform"
+  }
+}
+
+resource "aws_default_vpc" "default2" {
+  tags = {
+    Name = "Default VPC created by Terraform 2"
   }
 }
