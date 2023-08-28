@@ -34,9 +34,3 @@ resource "aws_default_vpc" "default" {
     Name = "Default VPC created by Terraform edited"
   }
 }
-
-resource "aws_default_vpc" "default2" {
-  tags = {
-    Name = "Default VPC created by Terraform 2"
-  }
-}
