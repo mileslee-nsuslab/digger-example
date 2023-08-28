@@ -84,7 +84,7 @@ jobs:
         if: always()
         with:
           status: ${{job.status}}
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
 
   terraform-apply:
     name: "terraform-apply (${{matrix.target.target}})"
@@ -143,4 +143,4 @@ jobs:
         if: always()
         with:
           status: ${{job.status}}
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
