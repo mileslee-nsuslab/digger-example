@@ -28,7 +28,6 @@ target_groups:
 #   s3_bucket_name_tfmigrate_history: 'miles-tfaction-backend' 
 #   template_dir: templates/example
 
-
 - working_directory: .
   target: .
   aws_region: us-east-1
