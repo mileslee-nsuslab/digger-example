@@ -25,6 +25,7 @@ jobs:
 
       - uses: suzuki-shunsuke/tfaction/list-targets@v0.6.2
         id: list-targets
+        
 
   tfmigrate-apply:
     name: "tfmigrate-apply (${{matrix.target.target}})"
@@ -59,6 +60,11 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
+      - run: tfaction get-or-create-drift-issue
+        shell: bash
+        env:
+         GITHUB_TOKEN: ${{ github.token }}ß
+
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
@@ -73,6 +79,12 @@ jobs:
         if: failure()
         with:
           github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+
+      - uses: suzuki-shunsuke/tfaction/update-drift-issue@v0.6.0
+        if: always()
+        with:
+          status: ${{job.status}}
+          github_token: ${{steps.generate_token.outputs.token}}
 
   terraform-apply:
     name: "terraform-apply (${{matrix.target.target}})"
@@ -107,6 +119,11 @@ jobs:
         with:
           secrets: ${{ toJSON(secrets) }}
 
+      - run: tfaction get-or-create-drift-issue
+        shell: bash
+        env:
+         GITHUB_TOKEN: ${{ github.token }}
+
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
@@ -121,3 +138,9 @@ jobs:
         if: failure()
         with:
           github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+
+      - uses: suzuki-shunsuke/tfaction/update-drift-issue@v0.6.0
+        if: always()
+        with:
+          status: ${{job.status}}
+          github_token: ${{steps.generate_token.outputs.token}}

@@ -35,6 +35,8 @@ target_groups:
   s3_bucket_name_tfmigrate_history: 'miles-tfaction-backend' 
   template_dir: templates/example
 
+  drift_detection: {}
+
 
   terraform_plan_config:
     aws_assume_role_arn: arn:aws:iam::651482608654:role/GitHubActions_Terraform_github_terraform_plan 
