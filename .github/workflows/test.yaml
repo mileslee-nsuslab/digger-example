@@ -64,7 +64,7 @@ jobs:
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
-          github_app_token: ${{ steps.generate_token.outputs.token }}
+          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
          # ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
 
       # - uses: suzuki-shunsuke/tfaction/test@v0.6.2
@@ -73,7 +73,7 @@ jobs:
 
       - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@v0.6.2
         with:
-          github_app_token:  ${{ steps.generate_token.outputs.token }}
+          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
 
   terraform-plan:
     name: "terraform-plan (${{matrix.target.target}})"
@@ -116,7 +116,7 @@ jobs:
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
-          github_app_token:  ${{ steps.generate_token.outputs.token }}
+          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
           #ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
 
       # - uses: suzuki-shunsuke/tfaction/test@v0.6.2
@@ -125,18 +125,18 @@ jobs:
 
       - uses: suzuki-shunsuke/tfaction/terraform-plan@v0.6.2
         with:
-          github_app_token:  ${{ steps.generate_token.outputs.token }}
+          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
 
-      - name: Slack Notification
-        id: slack
-        working-directory: ${{env.SLACK_NOTI_TEMPLATE_PATH}}
-        run: |
-          terraform -chdir="${{ env.TFACTION_TARGET }}" show tfplan.binary | tfnotify -config ./terraform/.tfnotify/slack.yml plan 
-        env:
-          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
-          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL }}
-          SLACK_BOT_NAME: tf-notify-bot
-          GITHUB_TOKEN:  ${{ steps.generate_token.outputs.token }}
+      # - name: Slack Notification
+      #   id: slack
+      #   working-directory: ${{env.SLACK_NOTI_TEMPLATE_PATH}}
+      #   run: |
+      #     terraform -chdir="${{ env.TFACTION_TARGET }}" show tfplan.binary | tfnotify -config ./terraform/.tfnotify/slack.yml plan 
+      #   env:
+      #     SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      #     SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL }}
+      #     SLACK_BOT_NAME: tf-notify-bot
+      #     GITHUB_TOKEN:  ${{ steps.generate_token.outputs.token }}
 
 
   # This job is used for branch protection rule
