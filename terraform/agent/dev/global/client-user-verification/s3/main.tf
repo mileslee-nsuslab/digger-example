@@ -25,7 +25,7 @@ provider "github" {
 }
 
 resource "aws_s3_bucket" "s3_bucket" {
-  bucket = "test-235264"
+  bucket = "test-2352364"
   force_destroy = true
 
   tags = {
