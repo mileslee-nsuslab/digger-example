@@ -1,17 +1,21 @@
 ---
-name: test
+name: plan
 on:
   pull_request:
     branches: [main]
+    paths:
+      - 'terraform/**'
 env:
+  SLACK_NOTI_TEMPLATE_PATH: './'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TFACTION_IS_APPLY: 'false'
 permissions:
   id-token: write
-  contents: read
+  contents: write
   pull-requests: write
 jobs:
   setup:
+    if : ${{ ! startsWith(github.event.pull_request.title, 'Scaffold a working directory') }}
     runs-on: ubuntu-latest
     outputs:
       tfmigrate_targets: ${{ steps.list-targets.outputs.tfmigrate_targets }}
@@ -42,16 +46,16 @@ jobs:
 
       # We recommend using GitHub App Token instead of personal access token,
       # but in this getting started let's use personal access token.
-      # - name: Generate token
-      #   id: generate_token
-      #   uses: tibdex/github-app-token@v1
-      #   with:
-      #     app_id: ${{ secrets.APP_ID }}
-      #     private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1.8.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - uses: aquaproj/aqua-installer@v1.1.2
         with:
-          aqua_version: v1.25.0
+          aqua_version: v2.11.0-1
 
       - uses: suzuki-shunsuke/tfaction/export-secrets@main
         with:
@@ -60,16 +64,16 @@ jobs:
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
+          github_app_token: ${{ steps.generate_token.outputs.token }}
+         # ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
 
       # - uses: suzuki-shunsuke/tfaction/test@v0.6.2
       #   with:
-      #     github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+      #     github_app_token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: suzuki-shunsuke/tfaction/tfmigrate-plan@v0.6.2
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token:  ${{ steps.generate_token.outputs.token }}
 
   terraform-plan:
     name: "terraform-plan (${{matrix.target.target}})"
@@ -89,12 +93,17 @@ jobs:
 
       # We recommend using GitHub App Token instead of personal access token,
       # but in this getting started let's use personal access token.
-      # - name: Generate token
-      #   id: generate_token
-      #   uses: tibdex/github-app-token@v1
-      #   with:
-      #     app_id: ${{ secrets.APP_ID }}
-      #     private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1.8.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: setup tfnotify
+        run: |
+          sudo curl -fL -o tfnotify.tar.gz https://github.com/mercari/tfnotify/releases/download/v0.8.0/tfnotify_linux_amd64.tar.gz
+          sudo tar -C /usr/bin -xzf ./tfnotify.tar.gz
 
       - uses: aquaproj/aqua-installer@v1.1.2
         with:
@@ -107,16 +116,28 @@ jobs:
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
-          ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
+          github_app_token:  ${{ steps.generate_token.outputs.token }}
+          #ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
 
       # - uses: suzuki-shunsuke/tfaction/test@v0.6.2
       #   with:
-      #     github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+      #     github_app_token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: suzuki-shunsuke/tfaction/terraform-plan@v0.6.2
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token:  ${{ steps.generate_token.outputs.token }}
+
+      - name: Slack Notification
+        id: slack
+        working-directory: ${{env.SLACK_NOTI_TEMPLATE_PATH}}
+        run: |
+          terraform -chdir="${{ env.TFACTION_TARGET }}" show tfplan.binary | tfnotify -config ./terraform/.tfnotify/slack.yml plan 
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+          SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL }}
+          SLACK_BOT_NAME: tf-notify-bot
+          GITHUB_TOKEN:  ${{ steps.generate_token.outputs.token }}
+
 
   # This job is used for branch protection rule
   # Add this job to `Status checks that are required`

@@ -27,13 +27,13 @@ jobs:
 
       # We recommend using GitHub App Token instead of personal access token,
       # but in this getting started let's use personal access token.
-      # - name: Generate token
-      #   id: generate_token
-      #   uses: tibdex/github-app-token@v1
-      #   with:
-      #     app_id: ${{ secrets.APP_ID }}
-      #     private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1.8.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - uses: suzuki-shunsuke/tfaction/create-scaffold-pr@v0.6.2
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token: ${{ steps.generate_token.outputs.token }}

@@ -3,7 +3,10 @@ name: apply
 on:
   push:
     branches: [main]
+    paths:
+    - "terraform/**"
 env:
+  SLACK_NOTI_TEMPLATE_PATH: './'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   TFACTION_IS_APPLY: 'true'
 permissions:
@@ -13,6 +16,7 @@ permissions:
   pull-requests: write
 jobs:
   setup:
+    if : ${{ ! startsWith(github.event.push.commits[0].message, 'scaffold a working directory') }}
     runs-on: ubuntu-latest
     outputs:
       tfmigrate_targets: ${{ steps.list-targets.outputs.tfmigrate_targets }}
@@ -45,12 +49,12 @@ jobs:
 
       # We recommend using GitHub App Token instead of personal access token,
       # but in this getting started let's use personal access token.
-      # - name: Generate token
-      #   id: generate_token
-      #   uses: tibdex/github-app-token@v1
-      #   with:
-      #     app_id: ${{ secrets.APP_ID }}
-      #     private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1.8.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
 
       - uses: aquaproj/aqua-installer@v1.1.2
         with:
@@ -63,28 +67,28 @@ jobs:
       - run: tfaction get-or-create-drift-issue
         shell: bash
         env:
-         GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+         GITHUB_TOKEN: ${{steps.generate_token.outputs.token}}
 
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token: ${{steps.generate_token.outputs.token}}
           ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
 
       - uses: suzuki-shunsuke/tfaction/tfmigrate-apply@v0.6.2
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token: ${{steps.generate_token.outputs.token}}
 
       - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@v0.6.2
         if: failure()
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token: ${{steps.generate_token.outputs.token}}
 
       - uses: suzuki-shunsuke/tfaction/update-drift-issue@v0.6.0
         if: always()
         with:
           status: ${{job.status}}
-          github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_token: ${{steps.generate_token.outputs.token}}
 
   terraform-apply:
     name: "terraform-apply (${{matrix.target.target}})"
@@ -104,12 +108,17 @@ jobs:
 
       # We recommend using GitHub App Token instead of personal access token,
       # but in this getting started let's use personal access token.
-      # - name: Generate token
-      #   id: generate_token
-      #   uses: tibdex/github-app-token@v1
-      #   with:
-      #     app_id: ${{ secrets.APP_ID }}
-      #     private_key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Generate token
+        id: generate_token
+        uses: tibdex/github-app-token@v1.8.0
+        with:
+          app_id: ${{ secrets.APP_ID }}
+          private_key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: setup tfnotify
+        run: |
+          sudo curl -fL -o tfnotify.tar.gz https://github.com/mercari/tfnotify/releases/download/v0.8.0/tfnotify_linux_amd64.tar.gz
+          sudo tar -C /usr/bin -xzf ./tfnotify.tar.gz
 
       - uses: aquaproj/aqua-installer@v1.1.2
         with:
@@ -122,25 +131,37 @@ jobs:
       - run: tfaction get-or-create-drift-issue
         shell: bash
         env:
-         GITHUB_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+         GITHUB_TOKEN: ${{steps.generate_token.outputs.token}}
 
       - uses: suzuki-shunsuke/tfaction/setup@v0.6.2
         id: setup
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token: ${{steps.generate_token.outputs.token}}
           ssh_key: ${{ secrets.TERRAFORM_PRIVATE_MODULE_SSH_KEY }} # This isn't needed if you don't use SSH key to checkout private Terraform Modules
 
       - uses: suzuki-shunsuke/tfaction/terraform-apply@v0.6.2
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token: ${{steps.generate_token.outputs.token}}
 
       - uses: suzuki-shunsuke/tfaction/create-follow-up-pr@v0.6.2
         if: failure()
         with:
-          github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+          github_app_token: ${{steps.generate_token.outputs.token}}
 
-      - uses: suzuki-shunsuke/tfaction/update-drift-issue@v0.6.0
-        if: always()
-        with:
-          status: ${{job.status}}
-          github_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+      # - uses: suzuki-shunsuke/tfaction/update-drift-issue@v0.6.0
+      #   if: always()
+      #   with:
+      #     status: ${{job.status}}
+      #     github_token: ${{steps.generate_token.outputs.token}}
+          
+      # - name: Slack Notification
+      #   id: slack
+      #   working-directory: ${{env.SLACK_NOTI_TEMPLATE_PATH}}
+      #   run: |
+      #     cd terraform/test|ls
+      #   env:
+      #     SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+      #     SLACK_CHANNEL_ID: ${{ secrets.SLACK_CHANNEL }}
+      #     SLACK_BOT_NAME: tf-notify-bot
+      #     GITHUB_TOKEN:  ${{ steps.generate_token.outputs.token }}
+
