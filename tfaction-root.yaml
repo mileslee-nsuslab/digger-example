@@ -6,8 +6,8 @@ target_groups:
 - working_directory: terraform/
   target: terraform/
   aws_region: us-east-1
-  s3_bucket_name_plan_file: 'miles-tfaction-backend' 
-  s3_bucket_name_tfmigrate_history: 'miles-tfaction-backend' 
+  s3_bucket_name_plan_file: 'miles-test-bucket-blue' 
+  s3_bucket_name_tfmigrate_history: 'miles-test-bucket-blue' 
   template_dir: templates/example
 
   terraform_plan_config:
