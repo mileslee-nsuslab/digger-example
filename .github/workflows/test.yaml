@@ -88,7 +88,6 @@ jobs:
     env:
       TFACTION_TARGET: ${{matrix.target.target}}
       TFACTION_JOB_TYPE: terraform
-      TF_ROOT: ${{ env.TFACTION_TARGET }}
     steps:
       - uses: actions/checkout@v3
 
@@ -159,6 +158,8 @@ jobs:
 
       # Generate Infracost JSON file as the baseline.
       - name: Generate Infracost cost estimate baseline
+        env:
+          TF_ROOT: ${{ env.TFACTION_TARGET }}
         run: |
           infracost breakdown --path=${TF_ROOT} \
                               --format=json \
@@ -170,6 +171,8 @@ jobs:
 
       # Generate an Infracost diff and save it to a JSON file.
       - name: Generate Infracost diff
+        env:
+          TF_ROOT: ${{ env.TFACTION_TARGET }}
         run: |
           infracost diff --path=${TF_ROOT} \
                           --format=json \
