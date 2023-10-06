@@ -24,3 +24,11 @@ provider "github" {
   owner = local.github_owner
 }
 
+resource "aws_s3_bucket" "s3_bucket" {
+  bucket = "test-235264"
+  force_destroy = true
+
+  tags = {
+    env = "dev"
+  }
+}
