@@ -99,11 +99,13 @@ jobs:
       #   with:
       #     app_id: ${{ secrets.APP_ID }}
       #     private_key: ${{ secrets.APP_PRIVATE_KEY }}
-
-      - name: setup tfnotify
+      - name: Setup binaries
         run: |
           sudo curl -fL -o tfnotify.tar.gz https://github.com/mercari/tfnotify/releases/download/v0.8.0/tfnotify_linux_amd64.tar.gz
           sudo tar -C /usr/bin -xzf ./tfnotify.tar.gz
+          sudo curl -fL -o rover_0.3.2_darwin_arm64.zip https://github.com/im2nguyen/rover/releases/download/v0.3.3/rover_0.3.3_linux_amd64.zip
+          sudo zip -FFv rover_0.3.2_darwin_arm64.zip --out rover.zip
+          sudo unzip -o rover.zip -d /usr/bin
 
       - uses: aquaproj/aqua-installer@v1.1.2
         with:
@@ -126,6 +128,21 @@ jobs:
       - uses: suzuki-shunsuke/tfaction/terraform-plan@v0.6.2
         with:
           github_app_token: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}
+        
+      - uses: iterative/setup-cml@v2
+        id : visualization_setup
+        with:
+          REPO_TOKEN: ${{ steps.generate_token.outputs.token }} # Can use the default token for most functions
+
+      - name: Terraform visualization
+        id: visualization
+        working-directory: ${{ env.TFACTION_TARGET }}
+        run: |
+          terraform show -json tfplan.binary > out.json
+          rover_v0.3.3 -planJSONPath ./out.json -genImage true
+          echo '## :mag_right: Plan Result Diagram' > report.md
+          echo '![](./rover.svg)' >> report.md
+          cml comment create --publish report.md
 
       # - name: Slack Notification
       #   id: slack
