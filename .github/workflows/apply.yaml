@@ -16,7 +16,7 @@ permissions:
   pull-requests: write
 jobs:
   setup:
-    if : ${{ ! startsWith(github.event.push.commits[0].message, 'scaffold a working directory') }}
+    if : ${{ ! startsWith(github.event.commits[0].message, 'scaffold a working directory') }}
     runs-on: ubuntu-latest
     outputs:
       tfmigrate_targets: ${{ steps.list-targets.outputs.tfmigrate_targets }}
