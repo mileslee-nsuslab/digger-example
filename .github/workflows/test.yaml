@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'terraform/**'
-      - '**/.terraform.lock.hcl'
+      - '!**/.terraform.lock.hcl'
 env:
   SLACK_NOTI_TEMPLATE_PATH: './'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
